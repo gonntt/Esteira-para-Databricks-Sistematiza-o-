@@ -1,0 +1,44 @@
+name: Databricks Qualidade CI
+
+on:
+  push:
+    branches: ["main","develop"]
+  pull_request:
+    branches: [main]
+
+  jobs:
+    build:
+      runs-on: ubuntu-latest
+
+      steps:
+        - name: Checkout do Código
+          uses: actions/checkout@v4
+
+        - name: Configurar Ambiente Python
+          uses: actions/setup-python@v4
+          with:
+            python-version: '3.9'
+
+        - name: Instalar Ferramentas de Qualidade e Dependências
+          run: |
+            python -m pip install --upgrade pip
+            pip install flake8 mypy pytest pytest-cov bandit
+
+        - name: 1. Validação de Lint (Padroonização)
+          run: |
+            flake8 notebooks/ --count --select=E9,F63,F7,F82 --show-source --statistics
+
+        - name: 2. Validação de Tipos (Mypy)
+          run: |
+            mypy notebooks/ --ignore-missing-imports
+
+        - name: 3. Análise de Segurança (SAST com Bandit)
+          run: |
+            bandit -r notebooks/ 
+
+        - name: 4. Testes Unitários e Cobertura (Mínimo 80%)
+          run: |
+            pytest --cov=notebooks --cov-report=term-missing --fail-under=80
+
+        - name: 5. Registro Final de Sucesso
+          run: echo "Validações de Qualidade concluídas com sucesso!"

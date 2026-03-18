@@ -1,21 +1,34 @@
-1. Decisões Técnicas Relevantes
-A escolha de ferramentas como Mypy e Bandit foi estratégica para simular um ambiente de DataOps. No Databricks, erros de tipo ou de segurança podem causar prejuízos financeiros e vazamento de dados sensíveis. O uso do GitHub Actions centraliza a governança, permitindo que cada alteração deixe uma trilha de auditoria digital.
+🚀 Governança e Qualidade: Esteira CI para Databricks
+1. Decisões Técnicas e Arquitetura
 
-2. Impactos da Ausência de Testes Automatizados
-Sem este pipeline, o processo de deploy seria dependente de validação humana, que é falha e lenta. A ausência de testes unitários em notebooks de engenharia de dados resulta em "bugs silenciosos" (dados processados incorretamente que só são percebidos meses depois em relatórios gerenciais).
+A implementação das ferramentas Mypy (tipagem estática) e Bandit (SAST) foi estratégica para transpor as boas práticas de Engenharia de Software para o mundo de Dados (DataOps).
 
-3. Possibilidades de Evolução para Entrega Contínua (CD)
-Uma evolução natural seria a integração com o Databricks CLI ou Terraform. Após a aprovação no CI, o pipeline poderia:
+    Segurança: No Databricks, falhas de permissão ou exposição de credenciais podem causar vazamentos catastróficos. O Bandit atua como a primeira linha de defesa.
 
-Realizar o deploy automático dos notebooks para o Workspace de Produção.
+    Auditabilidade: O uso do GitHub Actions centraliza a governança, garantindo que cada alteração no código gere uma trilha de auditoria imutável, essencial para conformidade bancária.
 
-Atualizar definições de Jobs/Workflows via API.
+2. Impactos da Ausência de Automação
 
-Implementar um mecanismo de Rollback automático caso o Job de produção falhasse após o deploy.
+A falta de um pipeline automatizado torna o deploy dependente de intervenção humana — um processo falho, lento e não rastreável.
 
-4. Riscos Mitigados pela CI
-Inconsistência entre ambientes: Garante que o código em Produção é idêntico ao testado em Desenvolvimento.
+    Bugs Silenciosos: Sem testes unitários, transformações de dados incorretas podem passar despercebidas, gerando relatórios gerenciais errados que só são detectados meses após o processamento.
 
-Vazamento de Credenciais: O scan de segurança impede o envio de chaves de acesso (hardcoded) para o repositório.
+    Custo Operacional: O retrabalho para corrigir dados corrompidos em Produção é infinitamente superior ao custo de manter uma esteira de validação em Desenvolvimento.
 
-Regressão de Código: Os testes garantem que novas funcionalidades não quebrem transformações de dados que já estavam funcionando.
+3. Riscos Mitigados pela CI
+
+    Inconsistência entre Ambientes: Garante que o código em Produção seja a cópia exata do que foi validado e aprovado em Desenvolvimento.
+
+    Vazamento de Credenciais: O scan de segurança (SAST) impede que chaves de acesso ou segredos fiquem expostos no histórico do repositório (hardcoded).
+
+    Regressão de Código: O gate de testes garante que novas funcionalidades não quebrem lógicas de negócio já consolidadas.
+
+4. Evolução para Entrega Contínua (CD)
+
+Como próximos passos para atingir a maturidade completa do ciclo Dev → Prod, o pipeline poderá:
+
+    Deploy Automatizado: Integração com Databricks CLI ou Terraform para publicação direta nos Workspaces.
+
+    Orquestração via API: Atualização automática de definições de Jobs e Workflows.
+
+    Rollback Estratégico: Mecanismo de reversão automática para a última versão estável caso o Job de produção falhe após o deploy.
